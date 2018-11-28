@@ -7,6 +7,8 @@ from pathlib import Path
 import shutil
 import site
 import threading
+import subprocess
+import threading
 
 import janus
 
@@ -36,6 +38,12 @@ CHILD_ENV = {
     'LD_PRELOAD': '/home/backend.ai/libbaihook.so',
 }
 
+def model_runner():
+    # For backend.ai serve feature
+    MODEL_NAME = 'model_resnet_v2'
+    proc = subprocess.Popen(
+        ['tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name='+MODEL_NAME+' --model_base_path=/home/work/'+MODEL_NAME], 
+        shell=True, env=os.environ)
 
 class Runner(BaseRunner):
 
@@ -56,6 +64,10 @@ class Runner(BaseRunner):
         pkgdir = Path(site.USER_SITE)
         pkgdir.mkdir(parents=True, exist_ok=True)
         shutil.copy(str(input_src), str(pkgdir / 'sitecustomize.py'))
+
+        # For backend.ai serve feature
+        t = threading.Thread(target=model_runner,)
+        t.start()
 
     async def init_with_loop(self):
         self.input_queue = janus.Queue(loop=self.loop)
