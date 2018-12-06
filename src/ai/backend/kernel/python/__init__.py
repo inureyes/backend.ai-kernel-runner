@@ -41,6 +41,8 @@ CHILD_ENV = {
 def model_runner():
     # For backend.ai serve feature
     MODEL_NAME = 'model_resnet_v2'
+    MODEL_NAME = 'model_half_plus_three'
+    MODEL_NAME = 'model_' + os.environ.get('MODEL_NAME')
     proc = subprocess.Popen(
         ['tensorflow_model_server --port=8500 --rest_api_port=8501 --model_name='+MODEL_NAME+' --model_base_path=/home/work/'+MODEL_NAME], 
         shell=True, env=os.environ)
